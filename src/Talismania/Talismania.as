@@ -13,12 +13,8 @@ package Talismania
 	import flash.filters.GlowFilter;
 	import flash.net.*;
 	import flash.geom.Point;
-	import flash.events.Event;
-	import flash.events.TimerEvent;
 	import flash.text.ReturnKeyLabel;
-	import flash.utils.Timer;
-	import flash.utils.getTimer;
-	import flash.utils.ByteArray;
+	import flash.utils.*;
 	import Talismania.TalismanFilter;
 	import Talismania.MegaTalisman;
 
@@ -26,7 +22,7 @@ package Talismania
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .Bind method to bind our class to the game
 	public class Talismania extends MovieClip
 	{
-		public const VERSION:String = "1.0";
+		public const VERSION:String = "1.3";
 		public const GAME_VERSION:String = "1.0.21";
 		public const BEZEL_VERSION:String = "0.1.0";
 		public const MOD_NAME:String = "Talismania";
@@ -45,13 +41,8 @@ package Talismania
 		
 		internal static var logger:Object;
 		internal static var storage:File;
-		private static var BASE64CHARS:String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
 		private var configuration:Object;
-		private var defaultHotkeys:Object;
-		private var infoPanelState:int;
-		private var activeBitmaps:Object;
-		private var megaTalismanMenu:MegaTalismanMenu;
 		
 		private var automaters:Array = new Array();
 		private var automatersEnabled:Boolean = false;
@@ -65,7 +56,10 @@ package Talismania
 		private var filterCost:int = 50000;
 		private var randomCost:int = 1000;
 		public var megaTalisman:MegaTalisman;
-		
+		private var eventTimer:Timer;
+		private var stringToolbox: Object;
+		private var prandom: Class;
+		private var currentSaveSlot: Number;
 		
 		// Parameterless constructor for flash.display.Loader
 		public function Talismania()
@@ -79,14 +73,16 @@ package Talismania
 			bezel = modLoader;
 			logger = bezel.getLogger("Talismania");
 			storage = File.applicationStorageDirectory;
+			storage = prepareFoldersAndLogger();
 			this.gameObjects = gameObjects;
 			this.core = gameObjects.GV.ingameCore;
 			this.cnt = gameObjects.GV.main.cntScreens.cntIngame;
 			this.SB = gameObjects.SB;
 			this.GV = gameObjects.GV;
 			this.prefs = gameObjects.prefs;
+			stringToolbox = getDefinitionByName("com.giab.common.utils.StringToolbox") as Class;
+			prandom = getDefinitionByName("com.giab.common.utils.PseudoRnd") as Class;
 			
-			prepareFoldersAndLogger();
 			
 			addEventListeners();
 			
@@ -129,7 +125,7 @@ package Talismania
 			timer.start();
 		}
 		
-		private function prepareFoldersAndLogger(): void
+		private function prepareFoldersAndLogger(): File
 		{
 			var storageFolder:File = storage.resolvePath("Talismania");
 			if (!storageFolder.isDirectory)
@@ -137,16 +133,7 @@ package Talismania
 				logger.log("PrepareFolders", "Creating ./Talismania");
 				storageFolder.createDirectory();
 			}
-
-			var fwgc:File = storage.resolvePath("FWGC");
-			if(!fwgc.isDirectory)
-				return;
-
-			logger.log("PrepareFolders", "Moving stuff from ./FWGC");
-			var oldConfig:File = storage.resolvePath("FWGC/FWGC_config.json");
-			
-			fwgc.moveToTrash();
-			logger.log("PrepareFolders", "Moved ./FWGC to trash!");
+			return storageFolder;
 		}
 		
 		public function prettyVersion(): String
@@ -158,7 +145,7 @@ package Talismania
 		{
 			if (pE.keyCode == 33) //page up
 			{
-				saveMegaTalisman();
+				//saveMegaTalisman();
 			}
 			if (pE.keyCode == 34) // page down
 			{
@@ -207,7 +194,7 @@ package Talismania
 				return;
 			}
 			var time:int = getTimer();
-			var frag:Object = filter.getTalismanMatchingFilter(talFrag.clone());
+			var frag:Object = filter.getTalismanMatchingFilter(talFrag.clone(), prandom);
 			if (frag != null)
 			{
 				var elapsedTime:Number = (getTimer() - time + 1) / 1000;
@@ -255,7 +242,7 @@ package Talismania
 					break;
 				case 2:
 					talFrag = null;
-					showMessage("you cannot edit fragments in the talisman");
+					showMessage("You cannot edit fragments in the talisman");
 					break;
 			}
 			return talFrag;
@@ -272,19 +259,22 @@ package Talismania
 		{
 			var vFile:File = null;
 			var vFileStream:FileStream = null;
-			var saveStr:String = base64EncodeString(this.megaTalisman.saveMegaTalisman());
+			logger.log("", "Saving mega talisman for slot : " + (GV.loaderSaver.activeSlotId + 1));
+			var saveStr:String = this.megaTalisman.saveMegaTalisman();
+			logger.log("", "Save string: " + saveStr);
 			try
 			{
 				vFileStream = new FileStream();
 				var path:String = "TalismaniaSlot" + (GV.loaderSaver.activeSlotId + 1) + ".dat";
-				vFile = File.applicationStorageDirectory.resolvePath(path);
+				vFile = storage.resolvePath(path);
+				logger.log("", vFile.nativePath);
 				vFileStream.open(vFile,FileMode.WRITE);
-				vFileStream.writeMultiByte(saveStr,"utf-8");
+				vFileStream.writeMultiByte(stringToolbox.base64EncodeString(saveStr),"utf-8");
 				vFileStream.close();
 			}
 			catch (e:Error)
 			{
-				logger.log("", "Saving Failed");
+				logger.log("", "Saving Failed: " + e.message);
 			}
 		}
 		
@@ -294,133 +284,66 @@ package Talismania
 			var vLoadedStr:String = null;
 			var vFileStream:FileStream = new FileStream();
 			this.megaTalisman = new MegaTalisman();
+			logger.log("", "Loading mega talisman for slot : " + (activeSlotId + 1));
 			try
 			{
 				var path:String = "TalismaniaSlot" + (activeSlotId + 1) + ".dat";
-				vFile = File.applicationStorageDirectory.resolvePath(path);
-				vFileStream.open(vFile,FileMode.READ);
-				vLoadedStr = vFileStream.readMultiByte(vFile.size,"utf-8");
-				vFileStream.close();
+				vFile = storage.resolvePath(path);
+				if (vFile.exists)
+				{
+					vFileStream.open(vFile,FileMode.READ);
+					vLoadedStr = vFileStream.readMultiByte(vFile.size,"utf-8");
+					vFileStream.close();
+			
+					logger.log("", "loaded slot: " + (activeSlotId + 1));
+					vLoadedStr = stringToolbox.base64DecodeString(vLoadedStr);
+					logger.log("", vLoadedStr);
+					this.megaTalisman.loadMegaTalisman(vLoadedStr);
+				}
+				else
+					logger.log("", "No file for slot : " + (activeSlotId+1));
 			}
 			catch(e:Error)
 			{
-				logger.log("", "Loading Failed");
+				logger.log("", "Loading Failed: " + e.message);
 				this.megaTalisman.loadMegaTalisman("Loading Failed");
 				return;
 			}
-			logger.log("", "loaded slot: " + (activeSlotId + 1));
-			vLoadedStr = base64DecodeString(vLoadedStr);
-			logger.log("", vLoadedStr);
-			this.megaTalisman.loadMegaTalisman(vLoadedStr);
 		}
 		
 		private function addEventListeners(): void
 		{
-			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, ehKeyboardInStageMenu, false, 0, true);
-			GV.loaderSaver.activeSlotId = -1;
-			addEventListener("Game Start", gameStart, false, 0, true);
+			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, ehKeyboardInStageMenu);
+			/*GV.loaderSaver.activeSlotId = -1;
+			currentSaveSlot = -1;
 			checkActiveSlotChanged();
+			eventTimer = new Timer(100, 0);
+			eventTimer.addEventListener(TimerEvent.TIMER, slotChecker);
+			eventTimer.start();*/
 		}
 		
-		private function gameStart(event:Event): void
+		private function slotChecker(e: Event): void
 		{
-			logger.log("", "Game loaded!");
-			megaTalismanMenu = new MegaTalismanMenu();
+			checkActiveSlotChanged();
 		}
 		
 		private function checkActiveSlotChanged(): void
 		{
-			if (GV.loaderSaver.activeSlotId != -1)
+			var slotNum: Number = GV.loaderSaver.activeSlotId;
+			if ((slotNum != -1) && slotNum != currentSaveSlot)
 			{
+				currentSaveSlot = slotNum;
 				loadMegaTalisman(GV.loaderSaver.activeSlotId);
-				dispatchEvent(new Event("Game Start"));
+				//dispatchEvent(new Event("Game Start"));
 			}
-			var timer:Timer = new Timer(100, 1);
-			var func:Function = function(e:Event): void {checkActiveSlotChanged(); };
-			timer.addEventListener(TimerEvent.TIMER, func);
-			timer.start();
 		}
 		
 		private function removeEventListeners(): void
 		{
-			GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, ehKeyboardInStageMenu, false);
+			GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, ehKeyboardInStageMenu);
+			/*eventTimer.removeEventListener(TimerEvent.TIMER, slotChecker);
+			eventTimer.stop();*/
 		}
 		
-		public static function base64EncodeString(pData:String) : String
-		{
-			var vBa:ByteArray = new ByteArray();
-			vBa.writeUTFBytes(pData);
-			return base64EncodeByteArray(vBa);
-		}
-		
-		public static function base64EncodeByteArray(pData:ByteArray) : String
-		{
-			var i:int = 0;
-			var vDataBuffer:Array = null;
-			var vStr:String = "";
-			var vOutputBuffer:Array = new Array(4);
-			pData.position = 0;
-			while(pData.bytesAvailable > 0)
-			{
-				vDataBuffer = new Array();
-				i = 0;
-				while(i < 3 && pData.bytesAvailable > 0)
-				{
-				   vDataBuffer[i] = pData.readUnsignedByte();
-				   i++;
-				}
-				vOutputBuffer[0] = (vDataBuffer[0] & 252) >> 2;
-				vOutputBuffer[1] = (vDataBuffer[0] & 3) << 4 | vDataBuffer[1] >> 4;
-				vOutputBuffer[2] = (vDataBuffer[1] & 15) << 2 | vDataBuffer[2] >> 6;
-				vOutputBuffer[3] = vDataBuffer[2] & 63;
-				for(i = vDataBuffer.length; i < 3; i++)
-				{
-				   vOutputBuffer[i + 1] = 64;
-				}
-				for(i = 0; i < vOutputBuffer.length; i++)
-				{
-				   vStr = vStr + BASE64CHARS.charAt(vOutputBuffer[i]);
-				}
-			}
-			return vStr;
-		}
-		
-		public static function base64DecodeString(pData:String) : String
-        {
-			var vBa:ByteArray = base64DecodeByteArray(pData);
-			return vBa.readUTFBytes(vBa.length);
-        }
-		
-		public static function base64DecodeByteArray(pData:String) : ByteArray
-		{
-			var i:int = 0;
-			var j:int = 0;
-			var vBa:ByteArray = new ByteArray();
-			var vDataBuffer:Array = new Array(4);
-			var vOutputBuffer:Array = new Array(3);
-			var iLim:int = pData.length;
-			for(i = 0; i < iLim; i = i + 4)
-			{
-				j = 0;
-				while(j < 4 && i + j < iLim)
-				{
-				   vDataBuffer[j] = BASE64CHARS.indexOf(pData.charAt(i + j));
-				   j++;
-				}
-				vOutputBuffer[0] = (vDataBuffer[0] << 2) + ((vDataBuffer[1] & 48) >> 4);
-				vOutputBuffer[1] = ((vDataBuffer[1] & 15) << 4) + ((vDataBuffer[2] & 60) >> 2);
-				vOutputBuffer[2] = ((vDataBuffer[2] & 3) << 6) + vDataBuffer[3];
-				for(j = 0; j < vOutputBuffer.length; j++)
-				{
-				   if(vDataBuffer[j + 1] == 64)
-				   {
-					  break;
-				   }
-				   vBa.writeByte(vOutputBuffer[j]);
-				}
-			}
-			vBa.position = 0;
-			return vBa;
-		}
 	}
 }

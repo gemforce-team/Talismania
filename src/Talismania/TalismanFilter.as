@@ -4,8 +4,7 @@ package Talismania
 	 * ...
 	 * @author Skillcheese
 	 */
-	
-	 import Talismania.PRandom;
+	import flash.utils.getDefinitionByName;
 	public class TalismanFilter 
 	{
 		public static var numTalismans:int = 8999998;
@@ -93,7 +92,7 @@ package Talismania
 			forceRune = runeId;
 		}
 		
-		public function getTalismanMatchingFilter(talismanBase:Object): Object
+		public function getTalismanMatchingFilter(talismanBase:Object, prn: Class): Object
 		{
 			if (talismanBase.rarity.g() < 100)
 			{
@@ -119,9 +118,10 @@ package Talismania
 			{
 				if (forceRune != -1)
 				{
-					var prn:PRandom = new PRandom();
-					prn.setSeed(i);
-					var rune:int = Math.floor(prn.getRnd() * 9.99);
+					
+					var pRand: Object = new prn();
+					pRand.setSeed(i);
+					var rune:int = Math.floor(pRand.getRnd() * 9.99);
 					if (rune >= 5)
 					{
 						continue;

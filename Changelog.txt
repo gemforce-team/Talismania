@@ -1,0 +1,4 @@
+20.03.2021 v1.3
+	Cleaned up the code, removed unnecessary duplication of game's code.
+	Removed copypasted leftovers from example mod.
+	Removed unused code (MegaTalisman)
