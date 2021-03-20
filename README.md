@@ -1,9 +1,9 @@
 # Talismania
-a GCFW mod that adds purchasable near perfect talisman fragments for a large sum of shadow cores
+A GCFW mod that adds purchasable near perfect talisman fragments for a large sum of shadow cores.
 
 # Mod files
-all the files will be in the game's Local Store folder
-%appdata%\com.giab.games.gcfw.steam\Local Store\Talismania
+All the files are stored in the game's Local Store folder:
+`%appdata%\com.giab.games.gcfw.steam\Local Store\Talismania`
 
 ## Installing the mod
 ### Important warning! Talismania depends on [Bezel Mod Loader](https://github.com/gemforce-team/BezelModLoader).
@@ -15,15 +15,16 @@ all the files will be in the game's Local Store folder
 Delete `Talismania-x.x-for-y.y.y.swf` from the `Mods` folder.
 
 ## Releases
-[Link to the latest release](https://github.com/Skillcheese/Talismania/releases/latest)
+[Link to the latest release](https://github.com/gemforce-team/Talismania/releases/latest)
 
-Release history: [Releases](https://github.com/Skillcheese/Talismania/releases)
+Release history: [Releases](https://github.com/gemforce-team/Talismania/releases)
 
 ## Hotkeys
 By default Talismania's hotkeys are:
 ```
-- in the talisman menu -
-these commmands must be used on a r100 talisman fragment!
+- In the talisman menu -
+These commmands must be used on a r100 talisman fragment!
+
 alt + k - filter a talisman fragment (costs 50,000 shadow cores)
 k - get a random new r100 talisman fragment (costs 1,000 shadow cores)
 ```
@@ -53,9 +54,9 @@ k - get a random new r100 talisman fragment (costs 1,000 shadow cores)
 		DAMAGE_TO_GIANTS
 
 # Bug reports and feedback
-Please submit an issue to [The issue tracker](https://github.com/Skillcheese/Talismania/issues) if you encounter a bug and there isn't already an open issue about it.
+Please submit an issue to [The issue tracker](https://github.com/gemforce-team/Talismania/issues) if you encounter a bug and there isn't already an open issue about it.
 
-You can find me on GemCraft's Discord server: https://discord.gg/ftyaJhx - Skillcheese#2962
+You can find Skillcheese on GemCraft's Discord server: https://discord.gg/ftyaJhx - Skillcheese#2962
 
 
 # Disclaimer
@@ -65,7 +66,6 @@ GemCraft - Frostborn Wrath is developed and owned by [gameinabottle](http://game
 
 
 # Credits
-Talismania is developed by Skillcheese
+Skillcheese - original developer
 
-
-# Hellrage, yes I stole your readme, ¯\_(ツ)_/¯
+Currently the mod is maintained by gemforce-team
