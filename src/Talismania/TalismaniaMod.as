@@ -12,7 +12,7 @@ package Talismania
     {
         public static const TALISMANIA_VERSION:String = "1.4"
 		public function get VERSION():String { return TALISMANIA_VERSION; }
-		public function get BEZEL_VERSION():String { return "1.1.0"; }
+		public function get BEZEL_VERSION():String { return "2.0.0"; }
 		public function get MOD_NAME():String { return "Talismania"; }
 
         private var talismania:GCFWTalismania;
