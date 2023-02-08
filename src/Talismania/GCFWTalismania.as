@@ -5,9 +5,7 @@ package Talismania
 	 * @author Skillcheese
 	 */
 	
-	import flash.display.MovieClip;
 	import Talismania.TalismanFilter;
-	import Bezel.BezelMod;
 	import Bezel.Bezel;
 	import Bezel.Logger;
 	import com.giab.games.gcfw.GV;
@@ -55,7 +53,7 @@ package Talismania
 			checkTalismanDrops();
 
 			bezel.keybindManager.registerHotkey("Talismania: Reroll For Best Fragment", new Keybind("alt+k"), "Costs 50k shadow cores");
-			bezel.keybindManager.registerHotkey("Talismania: Reroll For Random Fragment", new Keybind("k"), "Costs 1k shadow cores");
+			bezel.keybindManager.registerHotkey("Talismania: Reroll For +1 To All Skills", new Keybind("k"), "Costs 1k shadow cores");
 		}
 
 		public function showMessage(message:String) :void

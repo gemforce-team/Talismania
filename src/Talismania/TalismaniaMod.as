@@ -10,7 +10,7 @@ package Talismania
      */
     public class TalismaniaMod extends MovieClip implements BezelMod
     {
-        public static const TALISMANIA_VERSION:String = "1.4"
+        public static const TALISMANIA_VERSION:String = "1.5"
 		public function get VERSION():String { return TALISMANIA_VERSION; }
 		public function get BEZEL_VERSION():String { return "2.0.0"; }
 		public function get MOD_NAME():String { return "Talismania"; }

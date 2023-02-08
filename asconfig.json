@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		"source-path": [
+			"src"
+		],
+		"output": "obj/Talismania.swf",
+		"default-frame-rate": 30,
+		"default-background-color": "#FFFFFF",
+		"default-size": {
+			"width": 1920,
+			"height": 1080
+		},
+		"target-player": "28.0",
+		"advanced-telemetry": false,
+		"optimize": true,
+		"omit-trace-statements": true,
+		"strict": true,
+		"use-network": true,
+		"warnings": true,
+		"verbose-stacktraces": false,
+		"external-library-path": [
+			"${BezelLibs}/BezelModLoader.swc",
+			"${BezelLibs}/GemCraft.Frostborn.Wrath.swc",
+			"${BezelLibs}/FRESteamWorks.swc",
+			"${BezelLibs}/ANEBytecodeEditor.swc"
+		]
+	},
+	"files": [
+		"src/Talismania/TalismaniaMod.as"
+	],
+	"config": "air"
+}
