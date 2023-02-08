@@ -1,10 +1,14 @@
 package Talismania 
 {
+	import com.giab.games.gcfw.entity.TalismanFragment;
+	import com.giab.common.utils.PseudoRnd;
+	import com.giab.games.gcfw.constants.TalismanPropertyId;
+	import com.giab.games.gcfw.constants.TalismanFragmentType;
+
 	/**
 	 * ...
 	 * @author Skillcheese
 	 */
-	import flash.utils.getDefinitionByName;
 	public class TalismanFilter 
 	{
 		public static var numTalismans:int = 8999998;
@@ -16,63 +20,63 @@ package Talismania
 		private var idsEdge:Array;
 		
 		public static var worthless:Array = [
-		DAMAGE_TO_FLYING,
-		BEAM_DAMAGE,
-		BOLT_DAMAGE,
-		BARRAGE_DAMAGE,
-		MANA_FOR_EARLY_WAVES,
-		WHITEOUT_POISONBOOST_PCT,
-		DAMAGE_TO_BUILDINGS,
-		HEAVIER_ORBLETS,
-		FASTER_ORBLET_ROLLBACK,
-		MANA_SHARD_HARVESTING_SPEED,
-		FREEZE_ARMOR_PCT,
-		FREEZE_CORPSE_EXPLOSION_HP_PCT,
-		GEM_BOMB_EXTRA_WASP_CHANCE,
-		WASPS_FASTER_ATTACK,
-		ICESHARDS_BLEEDING_PCT,
-		ICESHARDS_SLOWINGDUR_PCT,
-		FREEZE_DURATION,
-		ICESHARDS_HEALTH_LOSS,
-		ICESHARDS_HPLOSS_PCT,
-		ICESHARDS_ARMORLOSS_PCT
+		TalismanPropertyId.DAMAGE_TO_FLYING,
+		TalismanPropertyId.BEAM_DAMAGE,
+		TalismanPropertyId.BOLT_DAMAGE,
+		TalismanPropertyId.BARRAGE_DAMAGE,
+		TalismanPropertyId.MANA_FOR_EARLY_WAVES,
+		TalismanPropertyId.WHITEOUT_POISONBOOST_PCT,
+		TalismanPropertyId.DAMAGE_TO_BUILDINGS,
+		TalismanPropertyId.HEAVIER_ORBLETS,
+		TalismanPropertyId.FASTER_ORBLET_ROLLBACK,
+		TalismanPropertyId.MANA_SHARD_HARVESTING_SPEED,
+		TalismanPropertyId.FREEZE_ARMOR_PCT,
+		TalismanPropertyId.FREEZE_CORPSE_EXPLOSION_HP_PCT,
+		TalismanPropertyId.GEM_BOMB_EXTRA_WASP_CHANCE,
+		TalismanPropertyId.WASPS_FASTER_ATTACK,
+		TalismanPropertyId.ICESHARDS_BLEEDING_PCT,
+		TalismanPropertyId.ICESHARDS_SLOWINGDUR_PCT,
+		TalismanPropertyId.FREEZE_DURATION,
+		TalismanPropertyId.ICESHARDS_EXTRA_HP_TAKEN,
+		TalismanPropertyId.ICESHARDS_HPLOSS_PCT,
+		TalismanPropertyId.ICESHARDS_ARMORLOSS_PCT
 		];
 		
 		public static var bestFilter:Array = [
-		DAMAGE_TO_SWARMLINGS,
-		DAMAGE_TO_REAVERS,
-		DAMAGE_TO_GIANTS,
-		XP_GAINED,
-		WHITEOUT_XPBOOST_PCT,
-		WHITEOUT_MANALEECHBOOST_PCT,
-		WHITEOUT_DURATION,
-		MAX_WHITEOUT_CHARGE
+		TalismanPropertyId.DAMAGE_TO_SWARMLINGS,
+		TalismanPropertyId.DAMAGE_TO_REAVERS,
+		TalismanPropertyId.DAMAGE_TO_GIANTS,
+		TalismanPropertyId.XP_GAINED,
+		TalismanPropertyId.WHITEOUT_XPBOOST_PCT,
+		TalismanPropertyId.WHITEOUT_MANALEECHBOOST_PCT,
+		TalismanPropertyId.WHITEOUT_DURATION,
+		TalismanPropertyId.MAX_WHITEOUT_CHARGE
 		];
 		
 		public static var myFilterCorner:Array = [
-		XP_GAINED,
-		WHITEOUT_XPBOOST_PCT,
-		WHITEOUT_MANALEECHBOOST_PCT,
-		FREEZE_DURATION,
-		ICESHARDS_HPLOSS_PCT
+		TalismanPropertyId.XP_GAINED,
+		TalismanPropertyId.WHITEOUT_XPBOOST_PCT,
+		TalismanPropertyId.WHITEOUT_MANALEECHBOOST_PCT,
+		TalismanPropertyId.FREEZE_DURATION,
+		TalismanPropertyId.ICESHARDS_HPLOSS_PCT
 		];
 		
 		public static var myFilterEdge:Array = [
-		XP_GAINED,
-		DAMAGE_TO_FLYING,
-		WIZLEVEL_TO_XP_AND_MANA,
-		DAMAGE_TO_SWARMLINGS,
-		DAMAGE_TO_REAVERS,
-		DAMAGE_TO_GIANTS
+		TalismanPropertyId.XP_GAINED,
+		TalismanPropertyId.DAMAGE_TO_FLYING,
+		TalismanPropertyId.WIZLEVEL_TO_XP_AND_MANA,
+		TalismanPropertyId.DAMAGE_TO_SWARMLINGS,
+		TalismanPropertyId.DAMAGE_TO_REAVERS,
+		TalismanPropertyId.DAMAGE_TO_GIANTS
 		];
 		
 		public static var myFilterInner:Array = [
-		XP_GAINED,
-		WIZLEVEL_TO_XP_AND_MANA,
-		WHITEOUT_XPBOOST_PCT,
-		DAMAGE_TO_SWARMLINGS,
-		DAMAGE_TO_REAVERS,
-		DAMAGE_TO_GIANTS
+		TalismanPropertyId.XP_GAINED,
+		TalismanPropertyId.WIZLEVEL_TO_XP_AND_MANA,
+		TalismanPropertyId.WHITEOUT_XPBOOST_PCT,
+		TalismanPropertyId.DAMAGE_TO_SWARMLINGS,
+		TalismanPropertyId.DAMAGE_TO_REAVERS,
+		TalismanPropertyId.DAMAGE_TO_GIANTS
 		];
 		
 		public function TalismanFilter(inner:Array = null, edge:Array = null, corner:Array = null,runeId:int = -1) 
@@ -92,7 +96,7 @@ package Talismania
 			forceRune = runeId;
 		}
 		
-		public function getTalismanMatchingFilter(talismanBase:Object, prn: Class): Object
+		public function getTalismanMatchingFilter(talismanBase:TalismanFragment): TalismanFragment
 		{
 			if (talismanBase.rarity.g() < 100)
 			{
@@ -104,13 +108,13 @@ package Talismania
 			var ids:Array;
 			switch(talismanBase.type)
 			{
-				case INNER:
+				case TalismanFragmentType.INNER:
 					ids = idsInner;
 					break;
-				case EDGE:
+				case TalismanFragmentType.EDGE:
 					ids = idsEdge;
 					break;
-				case CORNER:
+				case TalismanFragmentType.CORNER:
 					ids = idsCorner;
 					break;
 			}
@@ -119,7 +123,7 @@ package Talismania
 				if (forceRune != -1)
 				{
 					
-					var pRand: Object = new prn();
+					var pRand:PseudoRnd = new PseudoRnd();
 					pRand.setSeed(i);
 					var rune:int = Math.floor(pRand.getRnd() * 9.99);
 					if (rune >= 5)
@@ -128,7 +132,7 @@ package Talismania
 					}
 				}
 				
-				var talCurrent:Object = getTalisman(talismanBase, i);
+				var talCurrent:TalismanFragment = getTalisman(talismanBase, i);
 				passTest = true;
 				
 				for each (var id:int in ids)
@@ -147,114 +151,17 @@ package Talismania
 			return null;
 		}
 		
-		public function doesTalismanContainId(talisman:Object, id:int): Boolean
+		public function doesTalismanContainId(talisman:TalismanFragment, id:int): Boolean
 		{
 			return talisman.propertyIds.indexOf(id) != -1;
 		}
 		
-		public function getTalisman(talisman:Object, seed:int): Object
+		public function getTalisman(talisman:TalismanFragment, seed:int): TalismanFragment
 		{
 			talisman.seed = seed;
 			talisman.calculateProperties();
 			return talisman;
 		}
-		
-	  public static var vInnerPropertyIds:Array = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 28, 38, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40];
-      public static var vEdgePropertyIds:Array = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 35, 37, 38];
-	  public static var vCornerPropertyIds:Array = [7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34, 38, 39, 40, 41, 42, 43, 44];
-	  public static var EDGE:int = 0;
-	  public static var CORNER:int = 1;
-	  public static var INNER:int = 2;
-		
-	  public static var SKILLS_CONSTRUCTION:int = 0;
-      
-      public static var SKILLS_COMPONENT:int = 1;
-      
-      public static var SKILLS_FOCUS:int = 2;
-      
-      public static var SKILLS_ENHANCEMENT:int = 3;
-      
-      public static var SKILLS_STRIKE_SPELLS:int = 4;
-      
-      public static var SKILLS_WRATH:int = 5;
-      
-      public static var SKILLS_ALL:int = 6;
-      
-      public static var DAMAGE_TO_SWARMLINGS:int = 7;
-      
-      public static var DAMAGE_TO_REAVERS:int = 8;
-      
-      public static var DAMAGE_TO_GIANTS:int = 9;
-      
-      public static var XP_GAINED:int = 10;
-      
-      public static var WIZLEVEL_TO_XP_AND_MANA:int = 11;
-      
-      public static var INITIAL_MANA:int = 12;
-      
-      public static var DAMAGE_TO_FLYING:int = 13;
-      
-      public static var BEAM_DAMAGE:int = 15;
-      
-      public static var BOLT_DAMAGE:int = 16;
-      
-      public static var BARRAGE_DAMAGE:int = 17;
-      
-      public static var MANA_FOR_EARLY_WAVES:int = 28;
-      
-      public static var WHITEOUT_POISONBOOST_PCT:int = 38;
-      
-      public static var DAMAGE_TO_BUILDINGS:int = 14;
-      
-      public static var HEAVIER_ORBLETS:int = 31;
-      
-      public static var FASTER_ORBLET_ROLLBACK:int = 32;
-      
-      public static var MANA_SHARD_HARVESTING_SPEED:int = 33;
-      
-      public static var FREEZE_ARMOR_PCT:int = 35;
-      
-      public static var FREEZE_CRITHITDMG_PCT:int = 36;
-      
-      public static var FREEZE_CORPSE_EXPLOSION_HP_PCT:int = 37;
-      
-      public static var GEM_BOMB_EXTRA_WASP_CHANCE:int = 29;
-      
-      public static var SLOWER_KILLCHAIN_COOLDOWN:int = 30;
-      
-      public static var WASPS_FASTER_ATTACK:int = 34;
-      
-      public static var WHITEOUT_MANALEECHBOOST_PCT:int = 39;
-      
-      public static var WHITEOUT_XPBOOST_PCT:int = 40;
-      
-      public static var ICESHARDS_BLEEDING_PCT:int = 43;
-      
-      public static var ICESHARDS_SLOWINGDUR_PCT:int = 44;
-      
-      public static var FREEZE_DURATION:int = 18;
-      
-      public static var WHITEOUT_DURATION:int = 19;
-      
-      public static var ICESHARDS_HEALTH_LOSS:int = 20;
-      
-      public static var MAX_FREEZE_CHARGE:int = 21;
-      
-      public static var MAX_WHITEOUT_CHARGE:int = 22;
-      
-      public static var MAX_ICESHARDS_CHARGE:int = 23;
-      
-      public static var MAX_BOLT_CHARGE:int = 24;
-      
-      public static var MAX_BEAM_CHARGE:int = 25;
-      
-      public static var MAX_BARRAGE_CHARGE:int = 26;
-      
-      public static var MAX_SHRINE_CHARGE:int = 27;
-      
-      public static var ICESHARDS_HPLOSS_PCT:int = 41;
-      
-      public static var ICESHARDS_ARMORLOSS_PCT:int = 42;
 	}
 
 }
